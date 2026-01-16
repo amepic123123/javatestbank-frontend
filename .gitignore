@@ -1,0 +1,8 @@
+# Builds
+dist/
+build/
+backend/target/
+target/
+node_modules/
+.DS_Store
+.env
