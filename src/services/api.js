@@ -78,5 +78,12 @@ export const api = {
     });
     if (!response.ok) throw new Error("Failed to bulk post questions");
     return await response.json();
+  },
+
+  deleteQuestion: async (id) => {
+    const response = await fetch(`${API_BASE_URL}/admin/questions/${id}`, {
+      method: "DELETE"
+    });
+    if (!response.ok) throw new Error("Failed to delete question");
   }
 };

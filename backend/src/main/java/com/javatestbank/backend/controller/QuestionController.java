@@ -27,13 +27,19 @@ public class QuestionController {
     private final UserRepository userRepository;
     private final UserAnswerRepository userAnswerRepository;
     private final AIService aiService;
+    private final String adminUsername;
+    private final String adminPassword;
 
     public QuestionController(QuestionRepository questionRepository, UserRepository userRepository, 
-                              UserAnswerRepository userAnswerRepository, AIService aiService) {
+                              UserAnswerRepository userAnswerRepository, AIService aiService,
+                              @org.springframework.beans.factory.annotation.Value("${app.admin.username}") String adminUsername,
+                              @org.springframework.beans.factory.annotation.Value("${app.admin.password}") String adminPassword) {
         this.questionRepository = questionRepository;
         this.userRepository = userRepository;
         this.userAnswerRepository = userAnswerRepository;
         this.aiService = aiService;
+        this.adminUsername = adminUsername;
+        this.adminPassword = adminPassword;
     }
 
     @GetMapping("/questions")
@@ -150,7 +156,7 @@ public class QuestionController {
         String username = credentials.get("username");
         String password = credentials.get("password");
 
-        if ("admin".equals(username) && "admin123".equals(password)) {
+        if (adminUsername.equals(username) && adminPassword.equals(password)) {
             return ResponseEntity.ok(Map.of("id", "admin", "name", "Muhammed Alhomiedat", "isAdmin", true));
         }
         
@@ -198,5 +204,12 @@ public class QuestionController {
         ));
         
         return ResponseEntity.ok(progress);
+    }
+
+    @DeleteMapping("/admin/questions/{id}")
+    public ResponseEntity<?> deleteQuestion(@PathVariable Long id) {
+        userAnswerRepository.deleteByQuestionId(id);
+        questionRepository.deleteById(id);
+        return ResponseEntity.ok(Map.of("message", "Question deleted successfully"));
     }
 }

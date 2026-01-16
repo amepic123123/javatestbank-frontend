@@ -1,11 +1,30 @@
 import React from 'react';
+import { Trash2 } from 'lucide-react';
 
-const QuestionCard = ({ question, selectedOption, onSelectOption, feedback, isSubmitting }) => {
+const QuestionCard = ({ question, selectedOption, onSelectOption, feedback, isSubmitting, isAdmin, onDelete }) => {
     if (!question) return null;
 
     return (
-        <div className="card-glass" style={{ textAlign: 'left', margin: '20px auto', maxWidth: '800px' }}>
-            <h3 style={{ marginBottom: '1.5rem', fontSize: '1.25rem' }}>
+        <div className="card-glass" style={{ textAlign: 'left', margin: '20px auto', maxWidth: '800px', position: 'relative' }}>
+            {isAdmin && (
+                <button
+                    onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                    style={{
+                        position: 'absolute',
+                        top: '15px',
+                        right: '15px',
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--accent-error)',
+                        cursor: 'pointer',
+                        padding: '5px'
+                    }}
+                    title="Delete Question"
+                >
+                    <Trash2 size={20} />
+                </button>
+            )}
+            <h3 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', paddingRight: '40px' }}>
                 <span style={{ color: 'var(--text-secondary)', marginRight: '10px' }}>#{question.id}</span>
                 {question.text}
             </h3>

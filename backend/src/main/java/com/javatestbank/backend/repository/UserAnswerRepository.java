@@ -13,4 +13,7 @@ public interface UserAnswerRepository extends JpaRepository<UserAnswer, Long> {
     Optional<UserAnswer> findByUserIdAndQuestionId(Long userId, Long questionId);
     long countByQuestionId(Long questionId);
     long countByQuestionIdAndSelectedOptionIndex(Long questionId, int selectedOptionIndex);
+    
+    @org.springframework.transaction.annotation.Transactional
+    void deleteByQuestionId(Long questionId);
 }

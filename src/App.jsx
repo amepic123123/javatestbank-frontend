@@ -97,6 +97,17 @@ function App() {
     else setLoginError('');
   };
 
+  const handleDelete = async (questionId) => {
+    if (!window.confirm("Are you sure you want to delete this question?")) return;
+    try {
+      await api.deleteQuestion(questionId);
+      setQuestions(prev => prev.filter(q => q.id !== questionId));
+    } catch (err) {
+      console.error("Failed to delete question", err);
+      alert("Failed to delete question");
+    }
+  };
+
   const allAnswered = questions.length > 0 && questions.every(q => answers[q.id]);
 
   return (
@@ -177,6 +188,8 @@ function App() {
               feedback={answers[q.id]?.feedback}
               onSelectOption={(idx) => handleAnswer(q.id, idx)}
               isSubmitting={!!answers[q.id]}
+              isAdmin={user?.isAdmin}
+              onDelete={() => handleDelete(q.id)}
             />
           ))}
 
