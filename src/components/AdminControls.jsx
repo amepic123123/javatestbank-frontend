@@ -62,33 +62,18 @@ const AdminControls = ({ onQuestionAdded }) => {
                 return;
             }
 
-            const response = await fetch(`${API_BASE_URL}/admin/questions/import`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // Add Authorization header if needed, e.g., for basic auth
-                    // ...(username && password ? { 'Authorization': 'Basic ' + btoa(username + ':' + password) } : {})
-                },
-                body: jsonInput
-            });
-
-            if (response.ok) {
-                alert('Bulk Import Successful!');
-                setJsonInput('');
-                setIsBulkOpen(false);
-                setBulkStatus(''); // Clear status on success
-                // Optionally, trigger a refresh of the question list
-                // onQuestionAdded(); // If onQuestionAdded can trigger a full refresh
-            } else {
-                const errorData = await response.json();
-                alert('Import Failed: ' + (errorData.message || response.statusText));
-                setBulkStatus('Error: ' + (errorData.message || response.statusText));
-            }
+            await api.importQuestions(jsonInput);
+            alert('Bulk Import Successful!');
+            setJsonInput('');
+            setIsBulkOpen(false);
+            setBulkStatus('');
+            // Optional: onQuestionAdded() if parent supports full reload
         } catch (err) {
             console.error(err);
-            alert('Error parsing JSON or uploading.');
+            alert('Import Failed: ' + err.message);
             setBulkStatus('Error: ' + err.message);
         }
+
     };
 
     return (

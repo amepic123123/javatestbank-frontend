@@ -80,6 +80,19 @@ export const api = {
     return await response.json();
   },
 
+  importQuestions: async (jsonImport) => {
+    const response = await fetch(`${API_BASE_URL}/admin/questions/import`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: jsonImport // Already stringified
+    });
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.message || "Import failed");
+    }
+    return await response.json();
+  },
+
   deleteQuestion: async (id) => {
     const response = await fetch(`${API_BASE_URL}/admin/questions/${id}`, {
       method: "DELETE"
