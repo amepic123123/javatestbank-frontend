@@ -4,6 +4,7 @@ import { api } from './services/api';
 import QuestionCard from './components/QuestionCard';
 import AdminControls from './components/AdminControls';
 import QuizPage from './components/QuizPage';
+import { LogIn, LogOut, CheckCircle, Coffee } from 'lucide-react';
 
 function App() {
   const { user, login, register, logout, error: authError } = useAuth();
