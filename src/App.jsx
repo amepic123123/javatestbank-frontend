@@ -3,10 +3,12 @@ import { useAuth } from './context/AuthContext';
 import { api } from './services/api';
 import QuestionCard from './components/QuestionCard';
 import AdminControls from './components/AdminControls';
-import { LogIn, LogOut, CheckCircle, Coffee } from 'lucide-react';
+import QuizPage from './components/QuizPage';
 
 function App() {
   const { user, login, register, logout, error: authError } = useAuth();
+  const [view, setView] = useState('home'); // 'home' | 'quiz'
+
   const [questions, setQuestions] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -45,9 +47,11 @@ function App() {
   }, [authError]);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    loadQuestions(currentPage);
-  }, [currentPage]);
+    if (view === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      loadQuestions(currentPage);
+    }
+  }, [currentPage, view]);
 
   const loadQuestions = async (page) => {
     setIsLoadingQuestions(true);
@@ -158,6 +162,10 @@ function App() {
 
   const allAnswered = questions.length > 0 && questions.every(q => answers[q.id]);
 
+  if (view === 'quiz') {
+    return <QuizPage onBack={() => setView('home')} />;
+  }
+
   return (
     <div className="app-container">
       {/* Top Bar for Credits */}
@@ -170,6 +178,16 @@ function App() {
         <div className="header-brand">
           <Coffee size={32} color="var(--accent-primary)" />
           <h1>JavaHu</h1>
+
+          <button
+            onClick={() => setView('quiz')}
+            style={{
+              marginLeft: '30px', background: 'var(--bg-secondary)', border: '1px solid var(--accent-primary)',
+              color: 'var(--accent-primary)', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold'
+            }}
+          >
+            Start Timed Quiz (15m)
+          </button>
         </div>
 
         <div>

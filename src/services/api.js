@@ -20,6 +20,12 @@ export const api = {
     return await response.json();
   },
 
+  getQuizQuestions: async (count = 15) => {
+    const response = await fetch(`${API_BASE_URL}/questions/quiz?count=${count}`);
+    if (!response.ok) throw new Error("Failed to fetch quiz questions");
+    return await response.json();
+  },
+
   checkAnswer: async (questionId, selectedOptionIndex, username, selectedIndices = null) => {
     const body = { questionId, username };
     if (selectedIndices) {

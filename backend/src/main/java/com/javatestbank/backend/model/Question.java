@@ -33,6 +33,11 @@ public class Question {
     @Column(name = "correct_index")
     private List<Integer> correctIndices;
 
+    @ElementCollection
+    @CollectionTable(name = "question_answer_explanations", joinColumns = @JoinColumn(name = "question_id"))
+    @Column(name = "explanation_text", length = 1000)
+    private List<String> answerExplanations;
+
     public Question() {}
 
     public Question(String text, List<String> options, Integer correctIndex, String explanation) {
@@ -71,4 +76,7 @@ public class Question {
 
     public List<Integer> getCorrectIndices() { return correctIndices; }
     public void setCorrectIndices(List<Integer> correctIndices) { this.correctIndices = correctIndices; }
+
+    public List<String> getAnswerExplanations() { return answerExplanations; }
+    public void setAnswerExplanations(List<String> answerExplanations) { this.answerExplanations = answerExplanations; }
 }

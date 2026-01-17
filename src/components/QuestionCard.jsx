@@ -183,7 +183,22 @@ const QuestionCard = ({ question, selectedOption, selectedIndices, onSelectOptio
                     <h4 style={{ margin: '0 0 8px 0', color: feedback.correct ? 'var(--accent-success)' : 'var(--accent-error)' }}>
                         {feedback.correct ? 'Correct!' : 'Incorrect'}
                     </h4>
-                    <p style={{ margin: 0 }}>{feedback.explanation}</p>
+                    <p style={{ margin: 0 }}>
+                        {(() => {
+                            // Try to find specific explanation for the selected answer
+                            if (feedback.answerExplanations && feedback.answerExplanations.length > 0) {
+                                // For single select
+                                if (selectedOption !== undefined && feedback.answerExplanations[selectedOption]) {
+                                    return feedback.answerExplanations[selectedOption];
+                                }
+                                // For multi select (show all selected explanations joined, or just the main one?)
+                                // Simple approach: if multi-select and something is selected, try to show the first selected's explanation if available,
+                                // or just fallback to main explanation since multi-answer logic is complex.
+                                // Let's just fallback for multi-select for now unless we want to list them.
+                            }
+                            return feedback.explanation;
+                        })()}
+                    </p>
                 </div>
             )}
         </div>

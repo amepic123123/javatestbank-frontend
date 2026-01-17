@@ -52,6 +52,11 @@ public class QuestionController {
         return questionRepository.findAll(pageable);
     }
 
+    @GetMapping("/questions/quiz")
+    public List<Question> getQuizQuestions(@RequestParam(defaultValue = "15") int count) {
+        return questionRepository.findRandomQuestions(count);
+    }
+
     @PostMapping("/check-answer")
     public ResponseEntity<?> checkAnswer(@RequestBody Map<String, Object> payload) {
         Long questionId = Long.valueOf(payload.get("questionId").toString());
@@ -133,6 +138,7 @@ public class QuestionController {
             "correctIndex", question.getCorrectIndex(), // Legacy support
             "correctIndices", question.getCorrectIndices() != null ? question.getCorrectIndices() : List.of(),
             "explanation", question.getExplanation(),
+            "answerExplanations", question.getAnswerExplanations() != null ? question.getAnswerExplanations() : List.of(),
             "stats", getQuestionStats(questionId)
         ));
     }
@@ -273,17 +279,25 @@ public class QuestionController {
                 q.setOptions(options);
                 
                 List<Integer> indices = new java.util.ArrayList<>();
+                List<String> explanations = new java.util.ArrayList<>();
+                
                 for (int i = 0; i < dto.answers.size(); i++) {
                     AnswerImportDTO ans = dto.answers.get(i);
+                    explanations.add(ans.explanation != null ? ans.explanation : "");
+                    
                     if (ans.is_right) {
                         q.setCorrectIndex(i); // Last one wins for legacy field
                         indices.add(i);
-                        if (ans.explanation != null && !ans.explanation.isEmpty()) {
-                            q.setExplanation(ans.explanation);
+                        // Fallback: set main explanation if not set
+                        if (q.getExplanation() == null || q.getExplanation().isEmpty()) {
+                             if (ans.explanation != null && !ans.explanation.isEmpty()) {
+                                q.setExplanation(ans.explanation);
+                            }
                         }
                     }
                 }
                 q.setCorrectIndices(indices);
+                q.setAnswerExplanations(explanations);
             }
             
             // Auto-generate logic if missing
