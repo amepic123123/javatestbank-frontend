@@ -38,9 +38,11 @@ public class AIService {
                               "{ \"correctIndex\": 0, \"explanation\": \"Technical explanation here.\" }";
 
         String criticalRulesInit = "CRITICAL RULES:\n" +
-            "1. Pay extreme attention to STRING CASE SENSITIVITY (e.g., 'Java' != 'java').\n" +
-            "2. Pay attention to Object Reference Equality (==) vs Content Equality (.equals()).\n" +
-            "3. If code fails to compile, select the option mentioning 'Error' or 'Compilation'.\n";
+            "1. Pay extreme attention to STRING CASE SENSITIVITY (e.g., 'Java' != 'java'). 'a'.equals('A') is FALSE.\n" +
+            "2. String.equals() checks for EXACT character match. It is NOT case-insensitive.\n" +
+            "3. Pay attention to Object Reference Equality (==) vs Content Equality (.equals()).\n" +
+            "4. Trace the code execution strictly line-by-line.\n" +
+            "5. If code fails to compile, select the option mentioning 'Error' or 'Compilation'.\n";
 
         if (knownCorrectIndex != null) {
             taskDescription = String.format("Task: The correct answer IS ABSOLUTELY OPTION %d. Your job is ONLY to explain why this option is correct.\n", knownCorrectIndex);
