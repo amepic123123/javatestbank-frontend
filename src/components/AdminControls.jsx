@@ -6,6 +6,7 @@ const AdminControls = ({ onQuestionAdded }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [formData, setFormData] = useState({
         text: '',
+        codeSnippet: '',
         option1: '',
         option2: '',
         option3: '',
@@ -24,13 +25,14 @@ const AdminControls = ({ onQuestionAdded }) => {
         try {
             const payload = {
                 text: formData.text,
+                codeSnippet: formData.codeSnippet,
                 options: [formData.option1, formData.option2, formData.option3, formData.option4]
             };
             const newQ = await api.postQuestion(payload);
             onQuestionAdded(newQ);
             setIsOpen(false);
             setFormData({
-                text: '', option1: '', option2: '', option3: '', option4: ''
+                text: '', codeSnippet: '', option1: '', option2: '', option3: '', option4: ''
             });
             alert('Question Posted Successfully!');
         } catch (err) {
@@ -103,6 +105,15 @@ const AdminControls = ({ onQuestionAdded }) => {
                                 />
                             </div>
 
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '5px' }}>Code Snippet (Optional)</label>
+                                <textarea
+                                    name="codeSnippet"
+                                    value={formData.codeSnippet} onChange={handleChange}
+                                    style={{ width: '100%', padding: '10px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', color: 'white', borderRadius: '4px', fontFamily: 'monospace', minHeight: '100px' }}
+                                />
+                            </div>
+
                             {[1, 2, 3, 4].map((num, idx) => (
                                 <div key={num} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                                     <input
@@ -151,8 +162,9 @@ const AdminControls = ({ onQuestionAdded }) => {
     "options": ["A Car", "A Language", "A Food", "A Country"]
   },
   {
-    "text": "Which keyword is used for inheritance?",
-    "options": ["super", "this", "extends", "implements"]
+    "text": "What is the output?",
+    "codeSnippet": "System.out.println(1+1);",
+    "options": ["11", "2", "Error", "None"]
   }
 ]`}
                                 style={{
