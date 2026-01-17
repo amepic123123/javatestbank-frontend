@@ -70,7 +70,7 @@ const QuestionCard = ({ question, selectedOption, selectedIndices, onSelectOptio
 
                     // Styling based on state
                     const isSelected = isMultiSelect
-                        ? selectedIndices.includes(index)
+                        ? selectedIndices && selectedIndices.includes(index)
                         : selectedOption === index;
 
                     if (feedback) {
@@ -84,7 +84,6 @@ const QuestionCard = ({ question, selectedOption, selectedIndices, onSelectOptio
                             optionStyle.background = 'rgba(0, 230, 118, 0.1)';
                         } else if (isSelected && !feedback.correct) {
                             // Highlight selected wrong answers
-                            // In multi-select, if I selected it but it's not in correctIndices, it's wrong.
                             if (!isCorrectIndex) {
                                 optionStyle.borderColor = 'var(--accent-error)';
                                 optionStyle.background = 'rgba(255, 23, 68, 0.1)';
