@@ -113,15 +113,15 @@ function App() {
   return (
     <div className="app-container">
       {/* Header */}
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', paddingBottom: '20px', borderBottom: '1px solid var(--border-color)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+      <header className="app-header">
+        <div className="header-brand">
           <Coffee size={32} color="var(--accent-primary)" />
-          <h1 style={{ margin: 0, fontSize: '2rem' }}>JavaHu</h1>
+          <h1>JavaHu</h1>
         </div>
 
         <div>
           {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div className="user-controls">
               <span>Welcome, <strong style={{ color: 'var(--accent-primary)' }}>{user.name}</strong></span>
               <button onClick={() => { logout(); window.location.reload(); }} style={{ padding: '8px 16px', fontSize: '0.9rem' }}>
                 <LogOut size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
@@ -129,17 +129,17 @@ function App() {
               </button>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '5px' }}>
-              <form onSubmit={handleAuth} style={{ display: 'flex', gap: '10px' }}>
+            <div className="auth-form">
+              <form onSubmit={handleAuth} className="auth-inputs">
                 <input
                   placeholder="Username"
                   value={username} onChange={e => setUsername(e.target.value)}
-                  style={{ padding: '8px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'white' }}
+                  className="auth-input"
                 />
                 <input
                   type="password" placeholder="Password"
                   value={password} onChange={e => setPassword(e.target.value)}
-                  style={{ padding: '8px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'white' }}
+                  className="auth-input"
                 />
                 <button type="submit" style={{ padding: '8px 12px', background: isRegistering ? 'var(--accent-primary)' : 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: 'white' }}>
                   {isRegistering ? 'Sign Up' : <LogIn size={16} />}
@@ -163,12 +163,12 @@ function App() {
       {/* Main Content */}
       <main>
         {/* Score Board */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '30px', marginBottom: '30px' }}>
-          <div className="card-glass" style={{ padding: '15px 30px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div className="score-board">
+          <div className="card-glass score-card">
             <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Questions</span>
             <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{questions.length}</span>
           </div>
-          <div className="card-glass" style={{ padding: '15px 30px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div className="card-glass score-card">
             <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Score</span>
             <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--accent-success)' }}>{score}</span>
           </div>
@@ -208,7 +208,7 @@ function App() {
         </div>
 
         {/* Pagination Controls */}
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '40px', gap: '5px' }}>
+        <div className="pagination-controls">
           <button
             disabled={currentPage === 0}
             onClick={() => setCurrentPage(c => c - 1)}

@@ -4,13 +4,14 @@
   --bg-card: #1e1e1e;
   --text-primary: #ffffff;
   --text-secondary: #a0a0a0;
-  
+
   --accent-success: #00e676;
   --accent-error: #ff1744;
-  --accent-primary: #2979ff; /* Admin/Action buttons */
-  
+  --accent-primary: #2979ff;
+  /* Admin/Action buttons */
+
   --border-color: #333333;
-  
+
   font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -80,10 +81,155 @@ button:focus-visible {
   color: white;
   border: none;
 }
+
 .admin-btn:hover {
   background-color: #2962ff;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   color: var(--text-primary);
+}
+
+/* Layout Classes */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  width: 100%;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-brand h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.user-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.auth-inputs {
+  display: flex;
+  gap: 10px;
+}
+
+.auth-input {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: white;
+}
+
+.score-board {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.score-card {
+  padding: 15px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 120px;
+}
+
+.question-card-container {
+  text-align: left;
+  margin: 20px auto;
+  max-width: 800px;
+  position: relative;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  #root {
+    padding: 1rem;
+  }
+
+  .app-header {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+    text-align: center;
+  }
+
+  .header-brand {
+    justify-content: center;
+  }
+
+  .user-controls {
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+  }
+
+  .auth-inputs {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .auth-inputs input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .auth-inputs button {
+    width: 100%;
+  }
+
+  .auth-form {
+    width: 100%;
+    align-items: center;
+  }
+
+  .score-board {
+    flex-direction: row;
+    /* Keep row but maybe shrink gap */
+    gap: 15px;
+  }
+
+  .score-card {
+    padding: 15px;
+    flex: 1;
+  }
+
+  .card-glass {
+    padding: 1.5rem;
+  }
+
+  .question-card-container {
+    margin: 0;
+    width: 100%;
+  }
 }

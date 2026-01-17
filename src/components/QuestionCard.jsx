@@ -5,7 +5,7 @@ const QuestionCard = ({ question, selectedOption, onSelectOption, feedback, isSu
     if (!question) return null;
 
     return (
-        <div className="card-glass" style={{ textAlign: 'left', margin: '20px auto', maxWidth: '800px', position: 'relative' }}>
+        <div className="card-glass question-card-container">
             {isAdmin && (
                 <button
                     onClick={(e) => { e.stopPropagation(); onDelete(); }}
