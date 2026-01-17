@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 import java.util.Map;
@@ -317,6 +318,7 @@ public class QuestionController {
 
     static class AnswerImportDTO {
         public String answer;
+        @JsonProperty("is_right")
         public boolean is_right;
         public String explanation;
     }
