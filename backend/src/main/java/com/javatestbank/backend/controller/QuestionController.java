@@ -123,14 +123,21 @@ public class QuestionController {
     @PostMapping("/admin/questions")
     public Question createQuestion(@RequestBody Question question) {
         if (question.getOptions() != null && !question.getOptions().isEmpty()) {
-            Map<String, Object> analysis = aiService.analyzeQuestion(question.getText(), question.getCodeSnippet(), question.getOptions(), question.getCorrectIndex());
-            
-            // If user didn't specify index (null), rely on AI. If user did, AI just explains.
-            if (question.getCorrectIndex() == null && analysis.containsKey("correctIndex")) {
-                question.setCorrectIndex((Integer) analysis.get("correctIndex"));
-            }
-            if (analysis.containsKey("explanation")) {
-                question.setExplanation((String) analysis.get("explanation"));
+            // Logic: IF manual answer AND manual explanation -> SKIP AI.
+            boolean isFullyManual = question.getCorrectIndex() != null && 
+                                    question.getExplanation() != null && 
+                                    !question.getExplanation().isEmpty();
+
+            if (!isFullyManual) {
+                Map<String, Object> analysis = aiService.analyzeQuestion(question.getText(), question.getCodeSnippet(), question.getOptions(), question.getCorrectIndex());
+                
+                // If user didn't specify index (null), rely on AI. If user did, AI just explains.
+                if (question.getCorrectIndex() == null && analysis.containsKey("correctIndex")) {
+                    question.setCorrectIndex((Integer) analysis.get("correctIndex"));
+                }
+                if (analysis.containsKey("explanation")) {
+                    question.setExplanation((String) analysis.get("explanation"));
+                }
             }
         }
         return questionRepository.save(question);
@@ -140,12 +147,19 @@ public class QuestionController {
     public List<Question> createQuestionsBulk(@RequestBody List<Question> questions) {
         for (Question q : questions) {
             if (q.getOptions() != null && !q.getOptions().isEmpty()) {
-                Map<String, Object> analysis = aiService.analyzeQuestion(q.getText(), q.getCodeSnippet(), q.getOptions(), q.getCorrectIndex());
-                if (q.getCorrectIndex() == null && analysis.containsKey("correctIndex")) {
-                    q.setCorrectIndex((Integer) analysis.get("correctIndex"));
-                }
-                if (analysis.containsKey("explanation")) {
-                    q.setExplanation((String) analysis.get("explanation"));
+                // Logic: IF manual answer AND manual explanation -> SKIP AI.
+                boolean isFullyManual = q.getCorrectIndex() != null && 
+                                        q.getExplanation() != null && 
+                                        !q.getExplanation().isEmpty();
+
+                if (!isFullyManual) {
+                    Map<String, Object> analysis = aiService.analyzeQuestion(q.getText(), q.getCodeSnippet(), q.getOptions(), q.getCorrectIndex());
+                    if (q.getCorrectIndex() == null && analysis.containsKey("correctIndex")) {
+                        q.setCorrectIndex((Integer) analysis.get("correctIndex"));
+                    }
+                    if (analysis.containsKey("explanation")) {
+                        q.setExplanation((String) analysis.get("explanation"));
+                    }
                 }
             }
         }

@@ -8,6 +8,7 @@ const AdminControls = ({ onQuestionAdded }) => {
         text: '',
         codeSnippet: '',
         correctIndex: '', // null or '', handled as integer or null
+        explanation: '',
         option1: '',
         option2: '',
         option3: '',
@@ -28,13 +29,14 @@ const AdminControls = ({ onQuestionAdded }) => {
                 text: formData.text,
                 codeSnippet: formData.codeSnippet,
                 correctIndex: formData.correctIndex !== '' ? parseInt(formData.correctIndex) : null,
+                explanation: formData.explanation,
                 options: [formData.option1, formData.option2, formData.option3, formData.option4]
             };
             const newQ = await api.postQuestion(payload);
             onQuestionAdded(newQ);
             setIsOpen(false);
             setFormData({
-                text: '', codeSnippet: '', option1: '', option2: '', option3: '', option4: ''
+                text: '', codeSnippet: '', correctIndex: '', explanation: '', option1: '', option2: '', option3: '', option4: ''
             });
             alert('Question Posted Successfully!');
         } catch (err) {
@@ -132,6 +134,15 @@ const AdminControls = ({ onQuestionAdded }) => {
                                 </select>
                             </div>
 
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '5px' }}>Explanation (Optional - Auto-generate if empty)</label>
+                                <textarea
+                                    name="explanation"
+                                    value={formData.explanation} onChange={handleChange}
+                                    style={{ width: '100%', padding: '10px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', color: 'white', borderRadius: '4px', minHeight: '80px' }}
+                                />
+                            </div>
+
                             {[1, 2, 3, 4].map((num, idx) => (
                                 <div key={num} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                                     <input
@@ -183,7 +194,8 @@ const AdminControls = ({ onQuestionAdded }) => {
     "text": "What is the output?",
     "codeSnippet": "System.out.println(1+1);",
     "options": ["11", "2", "Error", "None"],
-    "correctIndex": 1
+    "correctIndex": 1,
+    "explanation": "Because 1+1 is 2 in Java"
   }
 ]`}
                                 style={{
