@@ -4,12 +4,12 @@ import { Trash2 } from 'lucide-react';
 const QuestionCard = ({ question, selectedOption, selectedIndices, onSelectOption, onToggleOption, onSubmitMulti, feedback, isSubmitting, isAdmin, onDelete }) => {
     if (!question) return null;
 
-    // Determine if multi-select based on correctIndices existence/length > 0
-    // OR if the text implies it.
-    // OR if the parent passes selectedIndices array.
-    const isMultiSelect = (question.correctIndices && question.correctIndices.length > 0) ||
+    // Determine if multi-select based on correctIndices existence/length > 1
+    // OR if the text implies it ("select all").
+    // OR if the parent passes selectedIndices array (legacy/forced state).
+    const isMultiSelect = (question.correctIndices && question.correctIndices.length > 1) ||
         (question.text && question.text.toLowerCase().includes("select all")) ||
-        Array.isArray(selectedIndices);
+        (Array.isArray(selectedIndices) && selectedIndices.length > 0);
 
     return (
         <div className="card-glass question-card-container">
