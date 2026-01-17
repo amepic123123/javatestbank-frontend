@@ -20,7 +20,7 @@ public class Question {
     private List<String> options;
 
     @Column(nullable = false)
-    private int correctIndex;
+    private Integer correctIndex;
 
     @Column(length = 2000)
     private String explanation;
@@ -30,14 +30,14 @@ public class Question {
 
     public Question() {}
 
-    public Question(String text, List<String> options, int correctIndex, String explanation) {
+    public Question(String text, List<String> options, Integer correctIndex, String explanation) {
         this.text = text;
         this.options = options;
         this.correctIndex = correctIndex;
         this.explanation = explanation;
     }
 
-    public Question(String text, List<String> options, int correctIndex, String explanation, String codeSnippet) {
+    public Question(String text, List<String> options, Integer correctIndex, String explanation, String codeSnippet) {
         this.text = text;
         this.options = options;
         this.correctIndex = correctIndex;
@@ -55,8 +55,8 @@ public class Question {
     public List<String> getOptions() { return options; }
     public void setOptions(List<String> options) { this.options = options; }
 
-    public int getCorrectIndex() { return correctIndex; }
-    public void setCorrectIndex(int correctIndex) { this.correctIndex = correctIndex; }
+    public Integer getCorrectIndex() { return correctIndex; }
+    public void setCorrectIndex(Integer correctIndex) { this.correctIndex = correctIndex; }
 
     public String getExplanation() { return explanation; }
     public void setExplanation(String explanation) { this.explanation = explanation; }

@@ -24,7 +24,7 @@ public class AIService {
         this.objectMapper = objectMapper;
     }
 
-    public Map<String, Object> analyzeQuestion(String questionText, String codeSnippet, List<String> options) {
+    public Map<String, Object> analyzeQuestion(String questionText, String codeSnippet, List<String> options, Integer knownCorrectIndex) {
         String promptText = String.format("Question: \"%s\"\n", questionText);
         
         if (codeSnippet != null && !codeSnippet.isEmpty()) {
@@ -33,17 +33,26 @@ public class AIService {
         
         promptText += String.format("Options: %s\n\n", options);
 
+        String taskDescription = "Task: Identify the correct option (0-based index) and provide a concise technical explanation.\n";
+        String outputFormat = "Output Format: Return strictly a JSON object exactly like this:\n" +
+                              "{ \"correctIndex\": 0, \"explanation\": \"Technical explanation here.\" }";
+
+        if (knownCorrectIndex != null) {
+            taskDescription = String.format("Task: The correct answer is OPTION %d. Provide a concise technical explanation for WHY this option is correct.\n", knownCorrectIndex);
+            outputFormat = String.format("Output Format: Return strictly a JSON object exactly like this:\n" +
+                                         "{ \"correctIndex\": %d, \"explanation\": \"Technical explanation here.\" }", knownCorrectIndex);
+        }
+
         String prompt = String.format(
             "Act as a strict Java Compiler and Runtime environment.\n" +
             "Analyze the following multiple-choice question:\n%s" +
-            "Task: Identify the correct option (0-based index) and provide a concise technical explanation.\n" +
+            "%s" +
             "CRITICAL RULES:\n" +
             "1. Pay extreme attention to STRING CASE SENSITIVITY (e.g., 'Java' != 'java').\n" +
             "2. Pay attention to Object Reference Equality (==) vs Content Equality (.equals()).\n" +
             "3. If code fails to compile, select the option mentioning 'Error' or 'Compilation'.\n" +
-            "Output Format: Return strictly a JSON object exactly like this:\n" +
-            "{ \"correctIndex\": 0, \"explanation\": \"Technical explanation here.\" }",
-            promptText
+            "%s",
+            promptText, taskDescription, outputFormat
         );
 
         Map<String, Object> request = Map.of(
@@ -101,7 +110,7 @@ public class AIService {
     
     // Fallback logic
     public String generateExplanation(String questionText, String codeSnippet, String correctAnswer) {
-        Map<String, Object> result = analyzeQuestion(questionText, codeSnippet, List.of(correctAnswer));
+        Map<String, Object> result = analyzeQuestion(questionText, codeSnippet, List.of(correctAnswer), 0);
         return (String) result.getOrDefault("explanation", "No explanation generated.");
     }
 }

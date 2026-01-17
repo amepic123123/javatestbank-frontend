@@ -7,6 +7,7 @@ const AdminControls = ({ onQuestionAdded }) => {
     const [formData, setFormData] = useState({
         text: '',
         codeSnippet: '',
+        correctIndex: '', // null or '', handled as integer or null
         option1: '',
         option2: '',
         option3: '',
@@ -26,6 +27,7 @@ const AdminControls = ({ onQuestionAdded }) => {
             const payload = {
                 text: formData.text,
                 codeSnippet: formData.codeSnippet,
+                correctIndex: formData.correctIndex !== '' ? parseInt(formData.correctIndex) : null,
                 options: [formData.option1, formData.option2, formData.option3, formData.option4]
             };
             const newQ = await api.postQuestion(payload);
@@ -114,6 +116,22 @@ const AdminControls = ({ onQuestionAdded }) => {
                                 />
                             </div>
 
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '5px' }}>Correct Answer (Optional - Auto-detect if empty)</label>
+                                <select
+                                    name="correctIndex"
+                                    value={formData.correctIndex}
+                                    onChange={handleChange}
+                                    style={{ width: '100%', padding: '10px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', color: 'white', borderRadius: '4px' }}
+                                >
+                                    <option value="">Auto-detect (AI)</option>
+                                    <option value="0">Option 1</option>
+                                    <option value="1">Option 2</option>
+                                    <option value="2">Option 3</option>
+                                    <option value="3">Option 4</option>
+                                </select>
+                            </div>
+
                             {[1, 2, 3, 4].map((num, idx) => (
                                 <div key={num} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                                     <input
@@ -164,7 +182,8 @@ const AdminControls = ({ onQuestionAdded }) => {
   {
     "text": "What is the output?",
     "codeSnippet": "System.out.println(1+1);",
-    "options": ["11", "2", "Error", "None"]
+    "options": ["11", "2", "Error", "None"],
+    "correctIndex": 1
   }
 ]`}
                                 style={{
