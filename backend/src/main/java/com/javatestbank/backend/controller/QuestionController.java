@@ -92,7 +92,13 @@ public class QuestionController {
             // Check logic
             List<Integer> correct = question.getCorrectIndices();
             if (correct != null && !correct.isEmpty()) {
-                 isCorrect = false; // user sent single, but question requires multi? simplified: fail.
+                 if (correct.size() == 1) {
+                     // Allow single selection if there is exactly one correct answer
+                     isCorrect = correct.get(0).equals(singleSelection);
+                 } else {
+                     // Truly multi-select question, but user sent single answer -> Fail
+                     isCorrect = false;
+                 }
             } else {
                  isCorrect = question.getCorrectIndex() != null && question.getCorrectIndex().equals(singleSelection);
             }
