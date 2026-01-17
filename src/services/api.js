@@ -105,7 +105,7 @@ export const api = {
     });
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.message || "Import failed");
+      throw new Error(errData.message || `Import failed (Status: ${response.status})`);
     }
     return await response.json();
   },
