@@ -20,11 +20,18 @@ export const api = {
     return await response.json();
   },
 
-  checkAnswer: async (questionId, selectedOptionIndex, username) => {
+  checkAnswer: async (questionId, selectedOptionIndex, username, selectedIndices = null) => {
+    const body = { questionId, username };
+    if (selectedIndices) {
+      body.selectedIndices = selectedIndices;
+    } else {
+      body.selectedOptionIndex = selectedOptionIndex;
+    }
+
     const response = await fetch(`${API_BASE_URL}/check-answer`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ questionId, selectedOptionIndex, username })
+      body: JSON.stringify(body)
     });
     if (!response.ok) throw new Error("Failed to check answer");
     return await response.json();

@@ -54,52 +54,83 @@ public class QuestionController {
     @PostMapping("/check-answer")
     public ResponseEntity<?> checkAnswer(@RequestBody Map<String, Object> payload) {
         Long questionId = Long.valueOf(payload.get("questionId").toString());
-        int selectedOptionIndex = Integer.parseInt(payload.get("selectedOptionIndex").toString());
-        String username = (String) payload.get("username"); // Optional username
+        String username = (String) payload.get("username");
 
         Optional<Question> qOpt = questionRepository.findById(questionId);
         if (qOpt.isEmpty()) return ResponseEntity.notFound().build();
 
         Question question = qOpt.get();
-        boolean isCorrect = question.getCorrectIndex() == selectedOptionIndex;
+        boolean isCorrect = false;
+        
+        Integer singleSelection = null;
+        List<Integer> multiSelection = null;
+
+        // Determine if single or multi-select based on payload or question type
+        if (payload.containsKey("selectedIndices")) {
+            List<?> rawList = (List<?>) payload.get("selectedIndices");
+            multiSelection = rawList.stream().map(o -> Integer.parseInt(o.toString())).collect(Collectors.toList());
+            
+            // Check logic
+            List<Integer> correct = question.getCorrectIndices();
+            if (correct != null && !correct.isEmpty()) {
+                // Multi-select check: sets must be equal
+                isCorrect = multiSelection.size() == correct.size() && multiSelection.containsAll(correct);
+            } else {
+                // Fallback: if only 1 correct index but user sent list
+                if (multiSelection.size() == 1 && question.getCorrectIndex() != null) {
+                    isCorrect = multiSelection.get(0).equals(question.getCorrectIndex());
+                }
+            }
+        } else if (payload.containsKey("selectedOptionIndex")) {
+            singleSelection = Integer.parseInt(payload.get("selectedOptionIndex").toString());
+            // Check logic
+            List<Integer> correct = question.getCorrectIndices();
+            if (correct != null && !correct.isEmpty()) {
+                 isCorrect = false; // user sent single, but question requires multi? simplified: fail.
+            } else {
+                 isCorrect = question.getCorrectIndex() != null && question.getCorrectIndex().equals(singleSelection);
+            }
+        }
         
         // Generate explanation if missing
         if (question.getExplanation() == null || question.getExplanation().isEmpty()) {
-            String correctAnswerText = question.getOptions().get(question.getCorrectIndex());
+            String correctAnswerText = "";
+            if (question.getCorrectIndices() != null && !question.getCorrectIndices().isEmpty()) {
+                correctAnswerText = question.getCorrectIndices().stream()
+                    .map(i -> question.getOptions().get(i))
+                    .collect(Collectors.joining(", "));
+            } else if (question.getCorrectIndex() != null) {
+                correctAnswerText = question.getOptions().get(question.getCorrectIndex());
+            }
             String aiExplanation = aiService.generateExplanation(question.getText(), question.getCodeSnippet(), correctAnswerText);
             question.setExplanation(aiExplanation);
             questionRepository.save(question);
         }
 
-        // Persist User Answer (Member or Anonymous)
+        // Persist User Answer
         User user = null;
         if (username != null && !username.isEmpty()) {
             Optional<User> userOpt = userRepository.findByUsername(username);
             if (userOpt.isPresent()) user = userOpt.get();
         }
-
+        
+        UserAnswer ua = new UserAnswer();
         if (user != null) {
-            // Logged in: Check if updated existing
             Optional<UserAnswer> existing = userAnswerRepository.findByUserIdAndQuestionId(user.getId(), questionId);
-            UserAnswer ua = existing.orElse(new UserAnswer());
+            if (existing.isPresent()) ua = existing.get();
             ua.setUser(user);
-            ua.setQuestion(question);
-            ua.setSelectedOptionIndex(selectedOptionIndex);
-            ua.setCorrect(isCorrect);
-            userAnswerRepository.save(ua);
-        } else {
-            // Anonymous: Create new entry every time (no tracking)
-            UserAnswer ua = new UserAnswer();
-            ua.setUser(null);
-            ua.setQuestion(question);
-            ua.setSelectedOptionIndex(selectedOptionIndex);
-            ua.setCorrect(isCorrect);
-            userAnswerRepository.save(ua);
         }
+        
+        ua.setQuestion(question);
+        if (singleSelection != null) ua.setSelectedOptionIndex(singleSelection);
+        if (multiSelection != null) ua.setSelectedIndices(multiSelection);
+        ua.setCorrect(isCorrect);
+        userAnswerRepository.save(ua);
 
         return ResponseEntity.ok(Map.of(
             "correct", isCorrect,
-            "correctIndex", question.getCorrectIndex(),
+            "correctIndex", question.getCorrectIndex(), // Legacy support
+            "correctIndices", question.getCorrectIndices() != null ? question.getCorrectIndices() : List.of(),
             "explanation", question.getExplanation(),
             "stats", getQuestionStats(questionId)
         ));
@@ -205,14 +236,16 @@ public class QuestionController {
 
         List<UserAnswer> answers = userAnswerRepository.findByUserId(userOpt.get().getId());
         
-        // Map to format convenient for frontend: { questionId: { selectedIndex, feedback: { correct, correctIndex, explanation } } }
+        // Map to format convenient for frontend
         Map<Long, Object> progress = answers.stream().collect(Collectors.toMap(
             ua -> ua.getQuestion().getId(),
             ua -> Map.of(
                 "selectedIndex", ua.getSelectedOptionIndex(),
+                "selectedIndices", ua.getSelectedIndices() != null ? ua.getSelectedIndices() : List.of(),
                 "feedback", Map.of(
                     "correct", ua.isCorrect(),
                     "correctIndex", ua.getQuestion().getCorrectIndex(),
+                    "correctIndices", ua.getQuestion().getCorrectIndices() != null ? ua.getQuestion().getCorrectIndices() : List.of(),
                     "explanation", ua.getQuestion().getExplanation()
                 )
             )
@@ -238,15 +271,18 @@ public class QuestionController {
                 List<String> options = dto.answers.stream().map(a -> a.answer).collect(Collectors.toList());
                 q.setOptions(options);
                 
+                List<Integer> indices = new java.util.ArrayList<>();
                 for (int i = 0; i < dto.answers.size(); i++) {
                     AnswerImportDTO ans = dto.answers.get(i);
                     if (ans.is_right) {
-                        q.setCorrectIndex(i);
+                        q.setCorrectIndex(i); // Last one wins for legacy field
+                        indices.add(i);
                         if (ans.explanation != null && !ans.explanation.isEmpty()) {
                             q.setExplanation(ans.explanation);
                         }
                     }
                 }
+                q.setCorrectIndices(indices);
             }
             
             // Auto-generate logic if missing

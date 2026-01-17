@@ -18,6 +18,12 @@ public class UserAnswer {
     private Question question;
 
     private int selectedOptionIndex;
+    
+    @ElementCollection
+    @CollectionTable(name = "user_answer_indices", joinColumns = @JoinColumn(name = "user_answer_id"))
+    @Column(name = "selected_index")
+    private java.util.List<Integer> selectedIndices;
+
     private boolean isCorrect;
 
     public UserAnswer() {}
@@ -40,6 +46,9 @@ public class UserAnswer {
 
     public int getSelectedOptionIndex() { return selectedOptionIndex; }
     public void setSelectedOptionIndex(int selectedOptionIndex) { this.selectedOptionIndex = selectedOptionIndex; }
+
+    public java.util.List<Integer> getSelectedIndices() { return selectedIndices; }
+    public void setSelectedIndices(java.util.List<Integer> selectedIndices) { this.selectedIndices = selectedIndices; }
 
     public boolean isCorrect() { return isCorrect; }
     public void setCorrect(boolean correct) { isCorrect = correct; }

@@ -1,8 +1,15 @@
 import React from 'react';
 import { Trash2 } from 'lucide-react';
 
-const QuestionCard = ({ question, selectedOption, onSelectOption, feedback, isSubmitting, isAdmin, onDelete }) => {
+const QuestionCard = ({ question, selectedOption, selectedIndices, onSelectOption, onToggleOption, onSubmitMulti, feedback, isSubmitting, isAdmin, onDelete }) => {
     if (!question) return null;
+
+    // Determine if multi-select based on correctIndices existence/length > 0
+    // OR if the text implies it.
+    // OR if the parent passes selectedIndices array.
+    const isMultiSelect = (question.correctIndices && question.correctIndices.length > 0) ||
+        (question.text && question.text.toLowerCase().includes("select all")) ||
+        Array.isArray(selectedIndices);
 
     return (
         <div className="card-glass question-card-container">
@@ -62,16 +69,26 @@ const QuestionCard = ({ question, selectedOption, onSelectOption, feedback, isSu
                     };
 
                     // Styling based on state
-                    const isSelected = selectedOption === index;
+                    const isSelected = isMultiSelect
+                        ? selectedIndices.includes(index)
+                        : selectedOption === index;
 
                     if (feedback) {
                         // Show Correct/Incorrect
-                        if (index === feedback.correctIndex) {
+                        const isCorrectIndex = isMultiSelect
+                            ? feedback.correctIndices && feedback.correctIndices.includes(index)
+                            : index === feedback.correctIndex;
+
+                        if (isCorrectIndex) {
                             optionStyle.borderColor = 'var(--accent-success)';
                             optionStyle.background = 'rgba(0, 230, 118, 0.1)';
                         } else if (isSelected && !feedback.correct) {
-                            optionStyle.borderColor = 'var(--accent-error)';
-                            optionStyle.background = 'rgba(255, 23, 68, 0.1)';
+                            // Highlight selected wrong answers
+                            // In multi-select, if I selected it but it's not in correctIndices, it's wrong.
+                            if (!isCorrectIndex) {
+                                optionStyle.borderColor = 'var(--accent-error)';
+                                optionStyle.background = 'rgba(255, 23, 68, 0.1)';
+                            }
                         }
                     } else if (isSelected) {
                         optionStyle.borderColor = 'var(--accent-primary)';
@@ -81,7 +98,11 @@ const QuestionCard = ({ question, selectedOption, onSelectOption, feedback, isSu
                     return (
                         <div
                             key={index}
-                            onClick={() => !feedback && !isSubmitting && onSelectOption(index)}
+                            onClick={() => {
+                                if (feedback || isSubmitting) return;
+                                if (isMultiSelect) onToggleOption(index);
+                                else onSelectOption(index);
+                            }}
                             style={optionStyle}
                             className="option-item"
                         >
@@ -89,16 +110,21 @@ const QuestionCard = ({ question, selectedOption, onSelectOption, feedback, isSu
                                 <div style={{
                                     width: '24px',
                                     height: '24px',
-                                    borderRadius: '50%',
-                                    border: `2px solid ${isSelected || (feedback && index === feedback.correctIndex) ? 'currentColor' : '#555'}`,
+                                    borderRadius: isMultiSelect ? '4px' : '50%', // Square for check, Circle for radio
+                                    border: `2px solid ${isSelected || (feedback && (isMultiSelect ? feedback.correctIndices?.includes(index) : index === feedback.correctIndex)) ? 'currentColor' : '#555'}`,
                                     marginRight: '16px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     flexShrink: 0
                                 }}>
-                                    {(isSelected || (feedback && index === feedback.correctIndex)) && (
-                                        <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'currentColor' }} />
+                                    {(isSelected || (feedback && (isMultiSelect ? feedback.correctIndices?.includes(index) : index === feedback.correctIndex))) && (
+                                        <div style={{
+                                            width: isMultiSelect ? '14px' : '12px',
+                                            height: isMultiSelect ? '14px' : '12px',
+                                            borderRadius: isMultiSelect ? '2px' : '50%',
+                                            background: 'currentColor'
+                                        }} />
                                     )}
                                 </div>
                                 <span style={{ fontSize: '1rem', zIndex: 1 }}>{option}</span>
@@ -130,6 +156,28 @@ const QuestionCard = ({ question, selectedOption, onSelectOption, feedback, isSu
                     );
                 })}
             </div>
+
+            {isMultiSelect && !feedback && (
+                <div style={{ marginTop: '20px', textAlign: 'right' }}>
+                    <button
+                        onClick={() => onSubmitMulti()}
+                        disabled={isSubmitting || !selectedIndices || selectedIndices.length === 0}
+                        style={{
+                            background: 'var(--accent-primary)',
+                            color: 'white',
+                            padding: '10px 20px',
+                            border: 'none',
+                            borderRadius: '6px',
+                            opacity: (!selectedIndices || selectedIndices.length === 0) ? 0.5 : 1,
+                            cursor: (!selectedIndices || selectedIndices.length === 0) ? 'not-allowed' : 'pointer',
+                            fontWeight: 'bold',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                        }}
+                    >
+                        Submit Answer
+                    </button>
+                </div>
+            )}
 
             {feedback && (
                 <div style={{ marginTop: '20px', padding: '15px', borderRadius: '8px', background: feedback.correct ? 'rgba(0, 230, 118, 0.1)' : 'rgba(255, 23, 68, 0.1)', border: `1px solid ${feedback.correct ? 'var(--accent-success)' : 'var(--accent-error)'}` }}>

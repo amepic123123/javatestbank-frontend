@@ -28,6 +28,11 @@ public class Question {
     @Column(length = 5000)
     private String codeSnippet;
 
+    @ElementCollection
+    @CollectionTable(name = "question_correct_indices", joinColumns = @JoinColumn(name = "question_id"))
+    @Column(name = "correct_index")
+    private List<Integer> correctIndices;
+
     public Question() {}
 
     public Question(String text, List<String> options, Integer correctIndex, String explanation) {
@@ -63,4 +68,7 @@ public class Question {
 
     public String getCodeSnippet() { return codeSnippet; }
     public void setCodeSnippet(String codeSnippet) { this.codeSnippet = codeSnippet; }
+
+    public List<Integer> getCorrectIndices() { return correctIndices; }
+    public void setCorrectIndices(List<Integer> correctIndices) { this.correctIndices = correctIndices; }
 }

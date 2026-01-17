@@ -10,7 +10,12 @@ function App() {
   const [questions, setQuestions] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  // State to track answers: { [questionId]: { selectedIndex, feedback } }
+  // State to track answers: 
+  // { [questionId]: { 
+  //     selectedIndex: number (legacy/single), 
+  //     selectedIndices: number[] (multi-select draft/final), 
+  //     feedback: object 
+  // } }
   const [answers, setAnswers] = useState({});
   const [score, setScore] = useState(0);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(true);
@@ -54,6 +59,49 @@ function App() {
       console.error("Failed to load questions", err);
     } finally {
       setIsLoadingQuestions(false);
+    }
+  };
+
+
+
+  const handleToggleOption = (questionId, index) => {
+    // If already has feedback, it's locked
+    if (answers[questionId]?.feedback) return;
+
+    setAnswers(prev => {
+      const current = prev[questionId] || {};
+      const indices = current.selectedIndices ? [...current.selectedIndices] : [];
+      if (indices.includes(index)) {
+        // Remove
+        const newIndices = indices.filter(i => i !== index);
+        return { ...prev, [questionId]: { ...current, selectedIndices: newIndices } };
+      } else {
+        // Add
+        const newIndices = [...indices, index];
+        return { ...prev, [questionId]: { ...current, selectedIndices: newIndices } };
+      }
+    });
+  };
+
+  const handleSubmitMulti = async (questionId) => {
+    const current = answers[questionId];
+    if (!current || !current.selectedIndices || current.selectedIndices.length === 0) return;
+
+    try {
+      const result = await api.checkAnswer(questionId, null, user?.name, current.selectedIndices);
+      setAnswers(prev => ({
+        ...prev,
+        [questionId]: {
+          ...prev[questionId],
+          feedback: result
+        }
+      }));
+
+      if (result.correct) {
+        setScore(curr => curr + 1);
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -190,9 +238,12 @@ function App() {
               key={q.id}
               question={q}
               selectedOption={answers[q.id]?.selectedIndex}
+              selectedIndices={answers[q.id]?.selectedIndices}
               feedback={answers[q.id]?.feedback}
               onSelectOption={(idx) => handleAnswer(q.id, idx)}
-              isSubmitting={!!answers[q.id]}
+              onToggleOption={(idx) => handleToggleOption(q.id, idx)}
+              onSubmitMulti={() => handleSubmitMulti(q.id)}
+              isSubmitting={!!answers[q.id]?.feedback} // Wait, for multi-select submitting is manual. Key is if feedback exists.
               isAdmin={user?.isAdmin}
               onDelete={() => handleDelete(q.id)}
             />
