@@ -32,7 +32,6 @@ const QuestionCard = ({ question, selectedOption, selectedIndices, onSelectOptio
                 </button>
             )}
             <h3 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', paddingRight: '40px' }}>
-                <span style={{ color: 'var(--text-secondary)', marginRight: '10px' }}>#{question.id}</span>
                 {question.text}
             </h3>
 
