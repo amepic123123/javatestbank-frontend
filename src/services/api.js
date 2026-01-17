@@ -20,8 +20,12 @@ export const api = {
     return await response.json();
   },
 
-  getQuizQuestions: async (count = 15) => {
-    const response = await fetch(`${API_BASE_URL}/questions/quiz?count=${count}`);
+  getQuizQuestions: async (count = 15, chapters = []) => {
+    let url = `${API_BASE_URL}/questions/quiz?count=${count}`;
+    if (chapters && chapters.length > 0) {
+      url += `&chapters=${chapters.join(',')}`;
+    }
+    const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to fetch quiz questions");
     return await response.json();
   },

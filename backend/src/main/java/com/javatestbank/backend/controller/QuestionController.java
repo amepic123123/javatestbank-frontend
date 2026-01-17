@@ -53,7 +53,17 @@ public class QuestionController {
     }
 
     @GetMapping("/questions/quiz")
-    public List<Question> getQuizQuestions(@RequestParam(defaultValue = "15") int count) {
+    public List<Question> getQuizQuestions(
+            @RequestParam(defaultValue = "15") int count,
+            @RequestParam(required = false) List<Integer> chapters
+    ) {
+        if (chapters != null && !chapters.isEmpty()) {
+            // Build Regex: ^(9|10|11)\.
+            String pattern = chapters.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining("|", "^(", ")\\."));
+            return questionRepository.findRandomQuestionsByRegex(pattern, count);
+        }
         return questionRepository.findRandomQuestions(count);
     }
 
