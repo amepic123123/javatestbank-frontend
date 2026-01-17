@@ -308,17 +308,18 @@ public class QuestionController {
                     for (int i = 0; i < dto.answers.size(); i++) {
                         AnswerImportDTO ans = dto.answers.get(i);
                         String rawExpl = ans.explanation != null ? ans.explanation : "";
-                    if (rawExpl.length() > 995) rawExpl = rawExpl.substring(0, 995) + "...";
-                    explanations.add(rawExpl);
+                        if (rawExpl.length() > 995) rawExpl = rawExpl.substring(0, 995) + "...";
+                        explanations.add(rawExpl);
                         
                         if (ans.is_right) {
                             q.setCorrectIndex(i); 
                             indices.add(i);
                             if (q.getExplanation() == null || q.getExplanation().isEmpty()) {
-                             if (ans.explanation != null && !ans.explanation.isEmpty()) {
-                                String combinedExpl = ans.explanation;
-                                if (combinedExpl.length() > 1995) combinedExpl = combinedExpl.substring(0, 1995) + "...";
-                                q.setExplanation(combinedExpl);
+                                 if (ans.explanation != null && !ans.explanation.isEmpty()) {
+                                    String combinedExpl = ans.explanation;
+                                    if (combinedExpl.length() > 1995) combinedExpl = combinedExpl.substring(0, 1995) + "...";
+                                    q.setExplanation(combinedExpl);
+                                }
                             }
                         }
                     }
