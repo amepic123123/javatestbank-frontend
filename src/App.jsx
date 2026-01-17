@@ -158,6 +158,9 @@ function App() {
             </div>
           )}
         </div>
+        <div style={{ textAlign: 'center', width: '100%', marginTop: '10px', fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 'bold' }}>
+          Made by Muhammed Alhomiedat and Omar Alomari
+        </div>
       </header>
 
       {/* Main Content */}
@@ -258,7 +261,7 @@ function App() {
       {/* Footer */}
       <footer style={{ marginTop: '60px', padding: '20px', borderTop: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
         <p>JavaHu &copy; 2026</p>
-        <p style={{ opacity: 0.8 }}>made by muhammed alhomiedat</p>
+        <p style={{ opacity: 0.8, fontWeight: 'bold' }}>Made by Muhammed Alhomiedat and Omar Alomari</p>
       </footer>
     </div>
   );
