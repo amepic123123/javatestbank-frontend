@@ -166,22 +166,17 @@ const QuestionCard = ({ question, selectedOption, selectedIndices, onSelectOptio
                     background: feedback.correct ? 'rgba(0, 230, 118, 0.1)' : 'rgba(255, 23, 68, 0.1)',
                     border: `1px solid ${feedback.correct ? 'var(--accent-success)' : 'var(--accent-error)'}`
                 }}>
-                    <h4 style={{ margin: '0 0 8px 0', color: feedback.correct ? 'var(--accent-success)' : 'var(--accent-error)' }}>
+                    <h4 style={{ margin: 0, color: feedback.correct ? 'var(--accent-success)' : 'var(--accent-error)' }}>
                         {feedback.correct ? 'Correct!' : (() => {
                             if (isMultiSelect && feedback.correctIndices && selectedIndices) {
                                 // Calculate how many correct ones were actually selected
                                 const correctSelectedCount = selectedIndices.filter(i => feedback.correctIndices.includes(i)).length;
                                 const totalCorrectCount = feedback.correctIndices.length;
-                                return `You chose ${correctSelectedCount}/${totalCorrectCount} correct answers`;
+                                return `Incorrect - You chose ${correctSelectedCount}/${totalCorrectCount} correct answers`;
                             }
                             return 'Incorrect';
                         })()}
                     </h4>
-
-                    {/* Main Explanation or AI Summary */}
-                    <div style={{ color: '#eee' }}>
-                        {feedback.explanation}
-                    </div>
                 </div>
             )}
         </div>
