@@ -201,7 +201,25 @@ const AdminControls = ({ onQuestionAdded }) => {
                             <X size={24} />
                         </button>
                         <h2 style={{ marginTop: 0 }}>Bulk Upload Questions</h2>
-                        <p style={{ fontSize: '0.9rem', color: '#ccc' }}>Paste a JSON array of questions. Supports both <strong>Smart Import</strong> (nested answers) and <strong>Simple Legacy</strong> formats.</p>
+                        <p style={{ fontSize: '0.9rem', color: '#ccc' }}>
+                            Paste a JSON array of questions or upload a file. Supports both <strong>Smart Import</strong> (nested answers) and <strong>Simple Legacy</strong> formats.
+                        </p>
+
+                        <div style={{ marginBottom: '15px' }}>
+                            <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem' }}>Upload JSON File:</label>
+                            <input
+                                type="file"
+                                accept=".json"
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+                                    const reader = new FileReader();
+                                    reader.onload = (evt) => setJsonInput(evt.target.result);
+                                    reader.readAsText(file);
+                                }}
+                                style={{ color: 'white' }}
+                            />
+                        </div>
 
                         <form onSubmit={handleBulkSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                             <textarea
