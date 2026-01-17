@@ -288,8 +288,13 @@ public class QuestionController {
         List<Question> questions = importDtos.stream().map(dto -> {
             try {
                 Question q = new Question();
-                q.setText(dto.question);
-                q.setCodeSnippet(dto.codeSnippet);
+                String text = dto.question;
+                if (text != null && text.length() > 995) text = text.substring(0, 995) + "...";
+                q.setText(text);
+
+                String code = dto.codeSnippet;
+                if (code != null && code.length() > 4995) code = code.substring(0, 4995) + "\n... (truncated)";
+                q.setCodeSnippet(code);
                 
                 if (q.getText() == null || q.getText().trim().isEmpty()) return null;
 
@@ -310,9 +315,10 @@ public class QuestionController {
                             q.setCorrectIndex(i); 
                             indices.add(i);
                             if (q.getExplanation() == null || q.getExplanation().isEmpty()) {
-                                 if (ans.explanation != null && !ans.explanation.isEmpty()) {
-                                    q.setExplanation(ans.explanation);
-                                }
+                             if (ans.explanation != null && !ans.explanation.isEmpty()) {
+                                String combinedExpl = ans.explanation;
+                                if (combinedExpl.length() > 1995) combinedExpl = combinedExpl.substring(0, 1995) + "...";
+                                q.setExplanation(combinedExpl);
                             }
                         }
                     }
@@ -332,7 +338,9 @@ public class QuestionController {
                             q.setCorrectIndex((Integer) analysis.get("correctIndex"));
                         }
                         if (q.getExplanation() == null && analysis.containsKey("explanation")) {
-                            q.setExplanation((String) analysis.get("explanation"));
+                            String aiExpl = (String) analysis.get("explanation");
+                            if (aiExpl.length() > 1995) aiExpl = aiExpl.substring(0, 1995) + "...";
+                            q.setExplanation(aiExpl);
                         }
                     }
                 }
@@ -348,6 +356,11 @@ public class QuestionController {
                         q.setCorrectIndex(0);
                         if (q.getExplanation() == null) q.setExplanation("Auto-defaulted to option A due to missing correct answer.");
                     }
+                }
+                
+                // Safe truncate main explanation one last time in case it came from elsewhere
+                if (q.getExplanation() != null && q.getExplanation().length() > 1995) {
+                    q.setExplanation(q.getExplanation().substring(0, 1995) + "...");
                 }
                 
                 return q;
