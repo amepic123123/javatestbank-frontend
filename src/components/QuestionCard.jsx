@@ -167,7 +167,15 @@ const QuestionCard = ({ question, selectedOption, selectedIndices, onSelectOptio
                     border: `1px solid ${feedback.correct ? 'var(--accent-success)' : 'var(--accent-error)'}`
                 }}>
                     <h4 style={{ margin: '0 0 8px 0', color: feedback.correct ? 'var(--accent-success)' : 'var(--accent-error)' }}>
-                        {feedback.correct ? 'Correct!' : isMultiSelect ? 'Incorrect / Incomplete' : 'Incorrect'}
+                        {feedback.correct ? 'Correct!' : (() => {
+                            if (isMultiSelect && feedback.correctIndices && selectedIndices) {
+                                // Calculate how many correct ones were actually selected
+                                const correctSelectedCount = selectedIndices.filter(i => feedback.correctIndices.includes(i)).length;
+                                const totalCorrectCount = feedback.correctIndices.length;
+                                return `You chose ${correctSelectedCount}/${totalCorrectCount} correct answers`;
+                            }
+                            return 'Incorrect';
+                        })()}
                     </h4>
 
                     {/* Main Explanation or AI Summary */}
