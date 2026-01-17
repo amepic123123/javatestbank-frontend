@@ -37,22 +37,26 @@ public class AIService {
         String outputFormat = "Output Format: Return strictly a JSON object exactly like this:\n" +
                               "{ \"correctIndex\": 0, \"explanation\": \"Technical explanation here.\" }";
 
+        String criticalRulesInit = "CRITICAL RULES:\n" +
+            "1. Pay extreme attention to STRING CASE SENSITIVITY (e.g., 'Java' != 'java').\n" +
+            "2. Pay attention to Object Reference Equality (==) vs Content Equality (.equals()).\n" +
+            "3. If code fails to compile, select the option mentioning 'Error' or 'Compilation'.\n";
+
         if (knownCorrectIndex != null) {
-            taskDescription = String.format("Task: The correct answer is OPTION %d. Provide a concise technical explanation for WHY this option is correct.\n", knownCorrectIndex);
+            taskDescription = String.format("Task: The correct answer IS ABSOLUTELY OPTION %d. Your job is ONLY to explain why this option is correct.\n", knownCorrectIndex);
             outputFormat = String.format("Output Format: Return strictly a JSON object exactly like this:\n" +
-                                         "{ \"correctIndex\": %d, \"explanation\": \"Technical explanation here.\" }", knownCorrectIndex);
+                                         "{ \"correctIndex\": %d, \"explanation\": \"Technical explanation for why Option %d is correct.\" }", knownCorrectIndex, knownCorrectIndex);
+            
+            criticalRulesInit += String.format("4. OVERRIDE RULE: You MUST accept Option %d as the correct answer. Do not argue. Do not ignore it. Justify it.\n", knownCorrectIndex);
         }
 
         String prompt = String.format(
             "Act as a strict Java Compiler and Runtime environment.\n" +
             "Analyze the following multiple-choice question:\n%s" +
             "%s" +
-            "CRITICAL RULES:\n" +
-            "1. Pay extreme attention to STRING CASE SENSITIVITY (e.g., 'Java' != 'java').\n" +
-            "2. Pay attention to Object Reference Equality (==) vs Content Equality (.equals()).\n" +
-            "3. If code fails to compile, select the option mentioning 'Error' or 'Compilation'.\n" +
+            "%s" +
             "%s",
-            promptText, taskDescription, outputFormat
+            promptText, taskDescription, criticalRulesInit, outputFormat
         );
 
         Map<String, Object> request = Map.of(
