@@ -34,15 +34,21 @@ public class AIService {
         promptText += String.format("Options: %s\n\n", options);
 
         String prompt = String.format(
+            "Act as a strict Java Compiler and Runtime environment.\n" +
             "Analyze the following multiple-choice question:\n%s" +
-            "Task: Identify the correct option (0-based index) and provide a short explanation.\n" +
+            "Task: Identify the correct option (0-based index) and provide a concise technical explanation.\n" +
+            "CRITICAL RULES:\n" +
+            "1. Pay extreme attention to STRING CASE SENSITIVITY (e.g., 'Java' != 'java').\n" +
+            "2. Pay attention to Object Reference Equality (==) vs Content Equality (.equals()).\n" +
+            "3. If code fails to compile, select the option mentioning 'Error' or 'Compilation'.\n" +
             "Output Format: Return strictly a JSON object exactly like this:\n" +
-            "{ \"correctIndex\": 0, \"explanation\": \"Replacing this text with the actual explanation.\" }",
+            "{ \"correctIndex\": 0, \"explanation\": \"Technical explanation here.\" }",
             promptText
         );
 
         Map<String, Object> request = Map.of(
-                "model", "llama-3.3-70b-versatile", // Updated to supported model
+                "model", "llama-3.3-70b-versatile",
+                "temperature", 0.0, // Strict, deterministic
                 "messages", List.of(
                         Map.of("role", "user", "content", prompt)
                 ),
