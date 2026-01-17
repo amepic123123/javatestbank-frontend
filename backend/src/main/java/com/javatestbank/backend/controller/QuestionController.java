@@ -302,7 +302,9 @@ public class QuestionController {
                     
                     for (int i = 0; i < dto.answers.size(); i++) {
                         AnswerImportDTO ans = dto.answers.get(i);
-                        explanations.add(ans.explanation != null ? ans.explanation : "");
+                        String rawExpl = ans.explanation != null ? ans.explanation : "";
+                    if (rawExpl.length() > 995) rawExpl = rawExpl.substring(0, 995) + "...";
+                    explanations.add(rawExpl);
                         
                         if (ans.is_right) {
                             q.setCorrectIndex(i); 

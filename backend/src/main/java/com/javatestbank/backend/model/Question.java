@@ -35,7 +35,7 @@ public class Question {
 
     @ElementCollection
     @CollectionTable(name = "question_answer_explanations", joinColumns = @JoinColumn(name = "question_id"))
-    @Column(name = "explanation_text", length = 1000)
+    @Column(name = "explanation_text", length = 3000)
     private List<String> answerExplanations;
 
     public Question() {}
