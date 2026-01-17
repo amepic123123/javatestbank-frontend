@@ -18,7 +18,7 @@ const AdminControls = ({ onQuestionAdded }) => {
 
     // Bulk Upload State
     const [isBulkOpen, setIsBulkOpen] = useState(false);
-    const [bulkJson, setBulkJson] = useState('');
+    const [jsonInput, setJsonInput] = useState('');
     const [bulkStatus, setBulkStatus] = useState('');
 
     const handleSubmit = async (e) => {
