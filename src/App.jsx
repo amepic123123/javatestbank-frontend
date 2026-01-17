@@ -112,8 +112,13 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Top Bar for Credits */}
+      <div style={{ background: 'var(--bg-secondary)', padding: '8px 20px', fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center', borderBottom: '1px solid var(--border-color)' }}>
+        Made by <a href="https://www.linkedin.com/in/muhammed-alhomiedat-b145b936a/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: '500' }}>Muhammed Alhomiedat</a> and <a href="https://www.linkedin.com/in/omar-al-omari-858b97260/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: '500' }}>Omar Alomari</a>
+      </div>
+
       {/* Header */}
-      <header className="app-header">
+      <header className="app-header" style={{ marginBottom: '20px' }}>
         <div className="header-brand">
           <Coffee size={32} color="var(--accent-primary)" />
           <h1>JavaHu</h1>
@@ -157,9 +162,6 @@ function App() {
               {loginError && <div style={{ color: 'var(--accent-error)', fontSize: '0.8rem' }}>{loginError}</div>}
             </div>
           )}
-        </div>
-        <div style={{ textAlign: 'center', width: '100%', marginTop: '10px', fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 'bold' }}>
-          Made by Muhammed Alhomiedat and Omar Alomari
         </div>
       </header>
 
@@ -259,9 +261,12 @@ function App() {
       </main>
 
       {/* Footer */}
-      <footer style={{ marginTop: '60px', padding: '20px', borderTop: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-        <p>JavaHu &copy; 2026</p>
-        <p style={{ opacity: 0.8, fontWeight: 'bold' }}>Made by Muhammed Alhomiedat and Omar Alomari</p>
+      <footer style={{ marginTop: '60px', padding: '30px 20px', borderTop: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontSize: '0.9rem', background: 'var(--bg-secondary)' }}>
+        <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '1rem', color: 'white' }}>JavaHu</div>
+        <p>&copy; 2026 All Rights Reserved.</p>
+        <p style={{ marginTop: '10px' }}>
+          Developed by <a href="https://www.linkedin.com/in/muhammed-alhomiedat-b145b936a/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-secondary)', textDecoration: 'underline' }}>Muhammed Alhomiedat</a> & <a href="https://www.linkedin.com/in/omar-al-omari-858b97260/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-secondary)', textDecoration: 'underline' }}>Omar Alomari</a>
+        </p>
       </footer>
     </div>
   );
