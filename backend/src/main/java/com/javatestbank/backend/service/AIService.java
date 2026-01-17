@@ -94,8 +94,8 @@ public class AIService {
     }
     
     // Fallback logic
-    public String generateExplanation(String questionText, String correctAnswer) {
-        Map<String, Object> result = analyzeQuestion(questionText, null, List.of(correctAnswer));
+    public String generateExplanation(String questionText, String codeSnippet, String correctAnswer) {
+        Map<String, Object> result = analyzeQuestion(questionText, codeSnippet, List.of(correctAnswer));
         return (String) result.getOrDefault("explanation", "No explanation generated.");
     }
 }

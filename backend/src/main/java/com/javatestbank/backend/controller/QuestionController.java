@@ -66,7 +66,7 @@ public class QuestionController {
         // Generate explanation if missing
         if (question.getExplanation() == null || question.getExplanation().isEmpty()) {
             String correctAnswerText = question.getOptions().get(question.getCorrectIndex());
-            String aiExplanation = aiService.generateExplanation(question.getText(), correctAnswerText);
+            String aiExplanation = aiService.generateExplanation(question.getText(), question.getCodeSnippet(), correctAnswerText);
             question.setExplanation(aiExplanation);
             questionRepository.save(question);
         }
