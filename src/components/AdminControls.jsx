@@ -62,7 +62,26 @@ const AdminControls = ({ onQuestionAdded }) => {
                 return;
             }
 
-            await api.importQuestions(jsonInput);
+            if (parsed.length === 0) {
+                alert('JSON array is empty.');
+                setBulkStatus('');
+                return;
+            }
+
+            // SMART DETECTION: Check first item to see which format it matches.
+            // Format A (Legacy/Internal): has "options" (Array of Strings) and "text"
+            // Format B (New/Import): has "answers" (Array of Objects) and "question"
+            const firstItem = parsed[0];
+            const isLegacyFormat = firstItem.hasOwnProperty('options') || firstItem.hasOwnProperty('correctIndex');
+
+            if (isLegacyFormat) {
+                console.log("Detected Legacy/Internal JSON format. Using postQuestionsBulk...");
+                await api.postQuestionsBulk(parsed);
+            } else {
+                console.log("Detected New/Import JSON format. Using importQuestions...");
+                await api.importQuestions(jsonInput);
+            }
+
             alert('Bulk Import Successful!');
             setJsonInput('');
             setIsBulkOpen(false);
@@ -182,7 +201,7 @@ const AdminControls = ({ onQuestionAdded }) => {
                             <X size={24} />
                         </button>
                         <h2 style={{ marginTop: 0 }}>Bulk Upload Questions</h2>
-                        <p style={{ fontSize: '0.9rem', color: '#ccc' }}>Paste a JSON array of questions. The AI will detect correct answers.</p>
+                        <p style={{ fontSize: '0.9rem', color: '#ccc' }}>Paste a JSON array of questions. Supports both <strong>Smart Import</strong> (nested answers) and <strong>Simple Legacy</strong> formats.</p>
 
                         <form onSubmit={handleBulkSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                             <textarea
