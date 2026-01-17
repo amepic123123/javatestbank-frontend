@@ -54,21 +54,39 @@ const AdminControls = ({ onQuestionAdded }) => {
         e.preventDefault();
         setBulkStatus('Processing... this may take a moment for AI analysis.');
         try {
-            const parsed = JSON.parse(bulkJson);
-            if (!Array.isArray(parsed)) throw new Error("Input must be a JSON Array");
+            // Validate JSON
+            const parsed = JSON.parse(jsonInput);
+            if (!Array.isArray(parsed)) {
+                alert('Input must be a JSON array of questions.');
+                setBulkStatus('Error: Input must be a JSON array.');
+                return;
+            }
 
-            const addedQuestions = await api.postQuestionsBulk(parsed);
+            const response = await fetch(`${API_BASE_URL}/admin/questions/import`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add Authorization header if needed, e.g., for basic auth
+                    // ...(username && password ? { 'Authorization': 'Basic ' + btoa(username + ':' + password) } : {})
+                },
+                body: jsonInput
+            });
 
-            // Notify parent for each added question to update list
-            // Ideally parent should handle bulk update, but for now we won't crash
-            // We'll just alert success.
-            alert(`Successfully added ${addedQuestions.length} questions!`);
-            setBulkJson('');
-            setIsBulkOpen(false);
-            setBulkStatus('');
-            // Trigger refresh logic if possible, or reload
-            window.location.reload();
+            if (response.ok) {
+                alert('Bulk Import Successful!');
+                setJsonInput('');
+                setIsBulkOpen(false);
+                setBulkStatus(''); // Clear status on success
+                // Optionally, trigger a refresh of the question list
+                // onQuestionAdded(); // If onQuestionAdded can trigger a full refresh
+            } else {
+                const errorData = await response.json();
+                alert('Import Failed: ' + (errorData.message || response.statusText));
+                setBulkStatus('Error: ' + (errorData.message || response.statusText));
+            }
         } catch (err) {
+            console.error(err);
+            alert('Error parsing JSON or uploading.');
             setBulkStatus('Error: ' + err.message);
         }
     };
@@ -183,19 +201,18 @@ const AdminControls = ({ onQuestionAdded }) => {
 
                         <form onSubmit={handleBulkSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                             <textarea
-                                value={bulkJson}
-                                onChange={e => setBulkJson(e.target.value)}
+                                value={jsonInput}
+                                onChange={e => setJsonInput(e.target.value)}
                                 placeholder={`[
   {
-    "text": "What is Java?",
-    "options": ["A Car", "A Language", "A Food", "A Country"]
-  },
-  {
-    "text": "What is the output?",
-    "codeSnippet": "System.out.println(1+1);",
-    "options": ["11", "2", "Error", "None"],
-    "correctIndex": 1,
-    "explanation": "Because 1+1 is 2 in Java"
+    "question": "Which code creates a Date object?",
+    "codeSnippet": "// A:\\nnew java.util.Date();\\n\\n// B:\\njava.util.Date date = new java.util.Date();",
+    "answers": [
+      { "answer": "A", "is_right": false, "explanation": "" },
+      { "answer": "B", "is_right": false, "explanation": "" },
+      { "answer": "Both", "is_right": true, "explanation": "Both create valid objects." },
+      { "answer": "Neither", "is_right": false, "explanation": "" }
+    ]
   }
 ]`}
                                 style={{

@@ -227,4 +227,61 @@ public class QuestionController {
         questionRepository.deleteById(id);
         return ResponseEntity.ok(Map.of("message", "Question deleted successfully"));
     }
+    @PostMapping("/admin/questions/import")
+    public ResponseEntity<?> importQuestions(@RequestBody List<QuestionImportDTO> importDtos) {
+        List<Question> questions = importDtos.stream().map(dto -> {
+            Question q = new Question();
+            q.setText(dto.question);
+            q.setCodeSnippet(dto.codeSnippet);
+            
+            if (dto.answers != null) {
+                List<String> options = dto.answers.stream().map(a -> a.answer).collect(Collectors.toList());
+                q.setOptions(options);
+                
+                for (int i = 0; i < dto.answers.size(); i++) {
+                    AnswerImportDTO ans = dto.answers.get(i);
+                    if (ans.is_right) {
+                        q.setCorrectIndex(i);
+                        if (ans.explanation != null && !ans.explanation.isEmpty()) {
+                            q.setExplanation(ans.explanation);
+                        }
+                    }
+                }
+            }
+            
+            // Auto-generate logic if missing
+            if (q.getOptions() != null && !q.getOptions().isEmpty()) {
+                boolean isFullyManual = q.getCorrectIndex() != null && 
+                                        q.getExplanation() != null && 
+                                        !q.getExplanation().isEmpty();
+
+                if (!isFullyManual) {
+                    Map<String, Object> analysis = aiService.analyzeQuestion(q.getText(), q.getCodeSnippet(), q.getOptions(), q.getCorrectIndex());
+                    if (q.getCorrectIndex() == null && analysis.containsKey("correctIndex")) {
+                        q.setCorrectIndex((Integer) analysis.get("correctIndex"));
+                    }
+                    if (q.getExplanation() == null && analysis.containsKey("explanation")) {
+                        q.setExplanation((String) analysis.get("explanation"));
+                    }
+                }
+            }
+            return q;
+        }).collect(Collectors.toList());
+        
+        questionRepository.saveAll(questions);
+        return ResponseEntity.ok(Map.of("message", "Imported " + questions.size() + " questions successfully"));
+    }
+
+    // DTOs for Import
+    static class QuestionImportDTO {
+        public String question;
+        public String codeSnippet;
+        public List<AnswerImportDTO> answers;
+    }
+
+    static class AnswerImportDTO {
+        public String answer;
+        public boolean is_right;
+        public String explanation;
+    }
 }
